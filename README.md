@@ -1,36 +1,87 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Chat Application with Authentication
 
-## Getting Started
+## Authentication Implementation
 
-First, run the development server:
+This application implements a simple authentication system using email/password credentials. The implementation includes:
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+1. User data with secure password storage
+2. Authentication utility functions
+3. Seeded test users for development
+
+### Seeded Users
+
+The following test users are automatically created when running the seed script:
+
+```
+1. Alice
+   - Email: alice@example.com
+   - Password: alice123
+
+2. Bob
+   - Email: bob@example.com
+   - Password: bob123
+
+3. Charlie
+   - Email: charlie@example.com
+   - Password: charlie123
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### How to Use Authentication
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. First, import the authentication utility:
+```typescript
+import { authenticateUser } from '../lib/auth';
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+2. Use the authenticateUser function:
+```typescript
+const user = await authenticateUser('alice@example.com', 'alice123');
+if (user) {
+  // User is authenticated
+  console.log('Logged in as:', user.name);
+} else {
+  // Authentication failed
+  console.log('Invalid credentials');
+}
+```
 
-## Learn More
+### Running the Example
 
-To learn more about Next.js, take a look at the following resources:
+To see the authentication in action:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. First, run the database migrations:
+```bash
+npx prisma migrate dev
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+2. Seed the database with test users:
+```bash
+npx prisma db seed
+```
 
-## Deploy on Vercel
+3. Run the authentication example:
+```bash
+ts-node examples/auth-example.ts
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Security Notes
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- In production, use strong passwords and proper password policies
+- Implement rate limiting for login attempts
+- Use secure session management
+- Consider adding two-factor authentication for enhanced security
+- Store sensitive configuration in environment variables
+
+### Database Schema
+
+The user model includes:
+- Unique ID (UUID)
+- Name
+- Email (unique)
+- Hashed password
+- Creation timestamp
+
+The authentication system is integrated with the existing chat functionality, allowing users to:
+- Authenticate before accessing chat features
+- Maintain persistent identity across sessions
+- Participate in chat threads securely
